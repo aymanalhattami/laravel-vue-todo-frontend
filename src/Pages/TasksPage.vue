@@ -18,7 +18,7 @@ onMounted(async () => {
 // const unCompletedTasks = computed(() => tasks.value.filter(task => task.is_completed));
 const showToggleCompletedBtn = computed(() => unCompletedTasks.value.length > 0 && completedTasks.value.length > 0);
 const completedTasksIsVisible = computed(() => unCompletedTasks.value.length === 0 || completedTasks.value.length > 0);
-const showCompletedTasks = ref(completedTasksIsVisible.value);
+const showCompletedTasks = ref(false || completedTasksIsVisible.value)
 
 </script>
 
