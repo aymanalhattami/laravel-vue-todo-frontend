@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { csrfCookie, login, register, logout, getUser } from "@/http/auth-api";
+import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
 
 export const useAuthStore = defineStore("authStore", () => {
     const user = ref(null);
     const errors = ref({});
+
     const isLoggedIn = computed(() => !!user.value);
+
     const fetchUser = async () => {
         try {
             const { data } = await getUser();
@@ -14,6 +16,7 @@ export const useAuthStore = defineStore("authStore", () => {
             user.value = null;
         }
     };
+
     const handleLogin = async (credentials) => {
         await csrfCookie();
         try {
@@ -26,6 +29,7 @@ export const useAuthStore = defineStore("authStore", () => {
             }
         }
     };
+
     const handleRegister = async (newUser) => {
         try {
             await register(newUser);
@@ -39,10 +43,12 @@ export const useAuthStore = defineStore("authStore", () => {
             }
         }
     };
+
     const handleLogout = async () => {
         await logout();
         user.value = null;
     };
+
     return {
         user,
         errors,
