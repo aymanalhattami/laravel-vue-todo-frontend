@@ -1,16 +1,17 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
+import { csrfCookie, login, register, logout, getUser } from "@/http/auth-api";
 
 export const useAuthStore = defineStore("authStore", () => {
     const user = ref(null);
     const errors = ref({});
+    const token = ref(null);
 
     const isLoggedIn = computed(() => !!user.value);
 
-    const fetchUser = async () => {
+    const fetchUser = async (token) => {
         try {
-            const { data } = await getUser();
+            const { data } = await getUser(token);
             user.value = data;
         } catch (error) {
             user.value = null;
@@ -20,8 +21,10 @@ export const useAuthStore = defineStore("authStore", () => {
     const handleLogin = async (credentials) => {
         await csrfCookie();
         try {
-            await login(credentials);
-            await fetchUser();
+            await login(credentials).then(response => {
+                token.value = response.data.token;
+            });
+            await fetchUser(token.value);
             errors.value = {};
         } catch (error) {
             if (error.response && error.response.status === 422) {
@@ -45,7 +48,7 @@ export const useAuthStore = defineStore("authStore", () => {
     };
 
     const handleLogout = async () => {
-        await logout();
+        await logout(token.value);
         user.value = null;
     };
 
@@ -53,6 +56,7 @@ export const useAuthStore = defineStore("authStore", () => {
         user,
         errors,
         isLoggedIn,
+        token,
         fetchUser,
         handleLogin,
         handleRegister,
